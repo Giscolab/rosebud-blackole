@@ -6,6 +6,11 @@ import { Starfield } from './Starfield.js';
 import { CameraController } from './CameraController.js';
 import { UIController } from './UIController.js';
 
+
+if (window.location.protocol === 'file:') {
+  throw new Error('Exécution non supportée via file://. Démarrez le serveur local (npm run dev) et ouvrez http://localhost:5173.');
+}
+
 /**
  * Main Application - Black Hole Accretion Disk Visualization
  * Real-time WebGL simulation with interactive physics controls
