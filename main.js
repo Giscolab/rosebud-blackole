@@ -59,6 +59,7 @@ class BlackHoleSimulation {
     this.blackHole = new BlackHole(this.scene, config.blackHole.radius);
     this.accretionDisk = new AccretionDisk(this.scene, this.blackHole, config.disk);
     this.starfield = new Starfield(this.scene, config.rendering.starfieldDensity);
+    this.blackHole.setGlowIntensity(config.rendering.glowIntensity);
 
     // Lighting
     this.setupLighting();
@@ -111,7 +112,8 @@ class BlackHoleSimulation {
 
   updateGlowIntensity(value) {
     config.rendering.glowIntensity = value;
-    this.accretionDisk.setOpacity(0.6 + value * 0.2);
+    this.blackHole.setGlowIntensity(value);
+    this.accretionDisk.setOpacity(0.55 + value * 0.12);
   }
 
   onWindowResize() {
