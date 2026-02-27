@@ -1,137 +1,106 @@
-# Bibliothèque de Composants Rosie
+# Black Hole + Accretion Disk Simulation
 
-Ce dossier contient des **composants Rosie pré-construits** que vous pouvez utiliser ou non, selon votre cas d'utilisation.
-Ce sont des composants prêts pour la production, testés - mais utilisez-les uniquement s'ils correspondent à la demande spécifique.
+Simulation WebGL temps réel d’un trou noir (horizon des événements) et d’un disque d’accrétion, construite avec **Three.js** et des modules JavaScript natifs.
 
-## 🚨 Important : Toujours Lire Avant Utilisation
+## Objectif du projet
 
-**Vous devez utiliser l'outil `read` pour charger le code source d'un composant AVANT de l'importer.**
+Ce repo sert à visualiser de manière interactive :
+- un **trou noir** central (horizon + glow),
+- un **disque d’accrétion** de particules en rotation,
+- un **champ d’étoiles** de fond,
+- des **contrôles UI/caméra** pour explorer la scène et ajuster les paramètres.
 
-Exemple de flux de travail :
-```javascript
-// 1. Utilisez d'abord l'outil read
-read(file_path="/rosie/controls/rosieControls.js")
+> Le rendu privilégie une visualisation pédagogique et artistique, avec des simplifications physiques assumées.
 
-// 2. Importez ensuite après examen
-import { PlayerController } from './rosie/controls/rosieControls.js';
+## Structure des modules
+
+### Entrées principales
+
+- `index.html` : bootstrap de la page, import map Three.js, chargement de `main.js`.
+- `main.js` : classe `BlackHoleSimulation`, initialise la scène, instancie les systèmes et pilote la boucle d’animation.
+- `config.js` : configuration centralisée (black hole, disque, caméra, rendu, ray tracing simplifié) + palette de couleurs du disque.
+
+### Classes / composants
+
+- `BlackHole.js` (`BlackHole`) : création de l’horizon des événements, glow, influence gravitationnelle simplifiée.
+- `AccretionDisk.js` (`AccretionDisk`) : génération des particules, animation orbitale, gestion des rayons et garde-fous de cohérence.
+- `Starfield.js` (`Starfield`) : génération/animation du fond stellaire.
+- `CameraController.js` (`CameraController`) : orbite souris, zoom, déplacement clavier, auto-rotation.
+- `UIController.js` (`UIController`) : panneau de contrôle (rayon horizon, rayons disque, rotation, distance caméra, glow), synchronisé avec l’état simulation.
+
+### Dossier annexe
+
+- `rosie/` : composants hérités (hors cœur de la simulation actuelle).
+
+## Lancement local (HTTP requis)
+
+Le projet utilise des modules ES (`type="module"`) et une import map : il faut le lancer via un **serveur HTTP local**.
+
+### Option A — Python
+
+```bash
+python3 -m http.server 8000
 ```
 
----
+Puis ouvrir : `http://localhost:8000`
 
-## Composants Disponibles
+### Option B — Node (serve)
 
-### 🎮 rosieControls.js (Jeux 3D - Three.js)
-
-**Chemin :** `/rosie/controls/rosieControls.js`  
-**Exports :** `PlayerController`, `ThirdPersonCameraController`, `FirstPersonCameraController`
-
-**Fonctionnalités :**
-- Mouvement WASD avec direction relative à la caméra
-- Saut, gravité, détection du sol
-- Caméra en orbite troisième personne OU verrouillage pointeur première personne
-- Contrôles mobiles automatiques (joystick virtuel + boutons)
-
-**Utiliser pour :** Plateformers 3D, jeux d'exploration, jeux d'action  
-**Ne pas utiliser pour :** Jeux 2D, jeux de course, jeux en vue du dessus
-
-**Exemple rapide :**
-```javascript
-const controller = new PlayerController(playerMesh, {
-  moveSpeed: 10,
-  jumpForce: 15,
-  groundLevel: 0
-});
-
-const camera = new ThirdPersonCameraController(
-  camera, playerMesh, renderer.domElement, {
-  distance: 7,
-  height: 3
-});
-
-// Dans la boucle de jeu :
-const rotation = camera.update();
-controller.update(deltaTime, rotation);
+```bash
+npx serve .
 ```
 
----
+Puis ouvrir l’URL affichée par `serve`.
 
-### 📱 phaserMobileControls.js (Jeux 2D - Phaser)
+### Pourquoi pas `file://` ?
 
-**Chemin :** `/rosie/controls/phaserMobileControls.js`  
-**Exports :** `VirtualJoystick`, `ActionButton`, `MobileControlsManager`
+Un chargement direct (`file://.../index.html`) casse généralement la résolution des modules/imports et certaines règles CORS du navigateur.
 
-**Fonctionnalités :**
-- Joystick virtuel pour le mouvement (position fixe, côté gauche)
-- Boutons d'action avec retour visuel (sauter, tirer, etc.)
-- Gestionnaire de contrôles mobiles avec gestion des zones sécurisées
+## Fonctionnalités actuelles
 
-**Utiliser pour :** Jeux mobiles 2D utilisant Phaser  
-**Ne pas utiliser pour :** Jeux 3D, jeux uniquement sur ordinateur
+- Rendu temps réel Three.js (trou noir + disque + étoiles).
+- Paramètres interactifs via UI :
+  - rayon de l’horizon,
+  - rayon interne/externe du disque,
+  - vitesse de rotation,
+  - distance caméra,
+  - intensité du glow.
+- Contrôles caméra : souris (orbite/zoom), clavier (WASD/flèches, Q/E), auto-rotate.
+- Garde-fous sur la géométrie du disque pour éviter les configurations invalides (inner/outer radius).
+- Coloration du disque par gradient de température simplifié.
 
-**Exemple rapide :**
-```javascript
-import { MobileControlsManager } from './rosie/controls/phaserMobileControls.js';
+## Limites connues
 
-// Dans GameScene - ajouter les contrôles
-this.mobileControls = new MobileControlsManager(this);
-this.mobileControls.addJoystick();
-this.mobileControls.addButton({
-  label: 'JUMP',
-  onPress: () => this.player.jump()
-});
+- Modèle physique simplifié : ce n’est pas un solveur GR complet (orbites, transfert radiatif, lentille gravitationnelle réaliste).
+- Pas de pipeline scientifique (unités physiques calibrées, validation sur données observées, export de métriques).
+- Dépendance CDN pour Three.js (pas de build locké/offline par défaut).
+- UI non internationalisée et non orientée accessibilité avancée (lecteurs d’écran, navigation complète clavier, etc.).
+- Optimisations GPU/CPU limitées pour des densités de particules très élevées.
 
-// Dans update() - obtenir le mouvement
-const move = this.mobileControls.getMovement();
-this.player.setVelocityX(move.x * speed);
-```
+## Roadmap
 
----
+### 1) Physics
+- Raffiner la dynamique orbitale (vitesse locale, précession, pertes d’énergie).
+- Améliorer la modélisation visuelle relativiste (lensing, doppler/beaming, redshift).
+- Ajouter des presets astrophysiques (Stellar-mass, SMBH, etc.).
 
-### 📱 rosieMobileControls.js (Interne)
+### 2) Performance
+- Réduire le coût CPU des updates particulaires (buffer updates, stratégies GPU-driven).
+- LOD / qualité adaptative selon FPS.
+- Profiling systématique + budget perf par module.
 
-**Chemin :** `/rosie/controls/rosieMobileControls.js`  
-**Note :** Importé automatiquement par rosieControls.js - pas besoin d'importer séparément
+### 3) UX
+- Presets de caméra et scénarios guidés.
+- Aide contextuelle et infobulles scientifiques.
+- Meilleure accessibilité (contrastes, focus, raccourcis, labels ARIA).
 
----
+### 4) Intégrations externes
+- Bundle outillage front (Vite/ESBuild) avec versions figées.
+- API d’export/import des presets de simulation.
+- Intégration éventuelle de datasets/références scientifiques externes.
 
-## Règles d'Utilisation
+## Archive documentation Rosie
 
-✅ **À FAIRE :**
-- Lire la source avec l'outil `read` avant utilisation
-- Importer depuis le dossier rosie : `'./rosie/controls/...'`
-- Utiliser uniquement les composants qui correspondent à la demande
-- Utiliser phaserMobileControls.js pour les jeux mobiles 2D
-- Utiliser rosieControls.js pour les jeux 3D
+La documentation Rosie précédente a été retirée du README principal car non pertinente au cœur du repo.
 
-❌ **À NE PAS FAIRE :**
-- Importer sans lire d'abord
-- Recréer ces composants
-- Utiliser les contrôles 3D pour les jeux 2D (ou vice versa)
----
-
-## 🎨 Conventions CSS
-
-### Naming (BEM)
-- Utiliser la convention **BEM** pour toutes les classes UI :
-  - Bloc : `.ui-panel`, `.ui-toggle`, `.title-overlay`
-  - Élément : `.ui-panel__title`, `.ui-panel__group`, `.ui-panel__value`, `.title-overlay__subtitle`
-- Éviter les noms génériques (`.control-group`, `.info-text`, etc.) dans les nouvelles contributions.
-
-### Structure
-- Centraliser les styles dans `style.css`.
-- Garder `index.html` sans style inline ni balises `<style>`.
-- Préférer des classes pour le styling et réserver les `id` aux hooks JavaScript indispensables (ex. sliders pilotés par `UIController`).
-
-### Exceptions
-- Les pseudo-éléments/pseudo-classes (`:hover`, `::-webkit-slider-thumb`, `::-moz-range-thumb`) sont autorisés même si la cible principale est une classe BEM.
-- Les sélecteurs globaux sont limités aux fondations documentaires (`html`, `body`, `canvas`).
-
-## Contraintes métier (Black Hole / Accretion Disk)
-
-Les contrôles de rayon appliquent désormais des garde-fous pour conserver une configuration physique cohérente :
-
-- Le slider principal contrôle explicitement le **rayon de l'horizon des événements** (et non une masse abstraite).
-- Le disque vérifie en permanence la règle : `innerRadius > blackHole.radius + innerRadiusMargin`.
-- Un écart minimal est aussi appliqué entre les rayons du disque : `outerRadius >= innerRadius + minOuterGap`.
-- Si une variation du rayon du trou noir rend le disque invalide, `innerRadius` et/ou `outerRadius` sont corrigés automatiquement.
-- Les valeurs corrigées sont réinjectées dans l'UI (sliders + valeurs affichées) pour éviter tout décalage visuel.
+- Archive conservée ici : `docs/ROSIE_ARCHIVE.md`
