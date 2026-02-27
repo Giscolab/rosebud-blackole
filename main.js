@@ -68,12 +68,16 @@ class BlackHoleSimulation {
 
     // UI controller with callbacks
     this.uiController = new UIController(config, {
-      onMassChange: (value) => this.blackHole.setRadius(value),
-      onInnerRadiusChange: (value) => this.accretionDisk.setInnerRadius(value),
-      onOuterRadiusChange: (value) => this.accretionDisk.setOuterRadius(value),
+      onMassChange: (eventHorizonRadius) => {
+        this.blackHole.setRadius(eventHorizonRadius);
+        return this.accretionDisk.onBlackHoleRadiusChange(eventHorizonRadius);
+      },
+      onInnerRadiusChange: (innerRadius) => this.accretionDisk.setInnerRadius(innerRadius),
+      onOuterRadiusChange: (outerRadius) => this.accretionDisk.setOuterRadius(outerRadius),
       onRotationSpeedChange: (value) => this.accretionDisk.setRotationSpeed(value),
       onDistanceChange: (value) => this.cameraController.setDistance(value),
-      onGlowChange: (value) => this.updateGlowIntensity(value)
+      onGlowChange: (value) => this.updateGlowIntensity(value),
+      getDiskRadiusState: () => this.accretionDisk.getRadiusState()
     });
 
     // Handle window resize

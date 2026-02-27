@@ -125,3 +125,13 @@ this.player.setVelocityX(move.x * speed);
 ### Exceptions
 - Les pseudo-éléments/pseudo-classes (`:hover`, `::-webkit-slider-thumb`, `::-moz-range-thumb`) sont autorisés même si la cible principale est une classe BEM.
 - Les sélecteurs globaux sont limités aux fondations documentaires (`html`, `body`, `canvas`).
+
+## Contraintes métier (Black Hole / Accretion Disk)
+
+Les contrôles de rayon appliquent désormais des garde-fous pour conserver une configuration physique cohérente :
+
+- Le slider principal contrôle explicitement le **rayon de l'horizon des événements** (et non une masse abstraite).
+- Le disque vérifie en permanence la règle : `innerRadius > blackHole.radius + innerRadiusMargin`.
+- Un écart minimal est aussi appliqué entre les rayons du disque : `outerRadius >= innerRadius + minOuterGap`.
+- Si une variation du rayon du trou noir rend le disque invalide, `innerRadius` et/ou `outerRadius` sont corrigés automatiquement.
+- Les valeurs corrigées sont réinjectées dans l'UI (sliders + valeurs affichées) pour éviter tout décalage visuel.

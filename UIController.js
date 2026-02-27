@@ -24,10 +24,10 @@ export class UIController {
 
       <div class="ui-panel__group">
         <label class="ui-panel__label">
-          Black Hole Mass
-          <span class="ui-panel__value" data-value="mass">${this.config.blackHole.radius.toFixed(2)}</span>
+          Black Hole Radius (Event Horizon)
+          <span class="ui-panel__value" id="event-horizon-radius-value" data-value="eventHorizonRadius">${this.config.blackHole.radius.toFixed(2)}</span>
         </label>
-        <input type="range" id="mass-slider" class="ui-panel__slider"
+        <input type="range" id="event-horizon-radius-slider" class="ui-panel__slider"
           min="${this.config.blackHole.minRadius}"
           max="${this.config.blackHole.maxRadius}"
           step="0.1"
@@ -39,11 +39,11 @@ export class UIController {
       <div class="ui-panel__group">
         <label class="ui-panel__label">
           Disk Inner Radius
-          <span class="ui-panel__value" data-value="inner">${this.config.disk.innerRadius.toFixed(1)}</span>
+          <span class="ui-panel__value" id="inner-value" data-value="inner">${this.config.disk.innerRadius.toFixed(1)}</span>
         </label>
         <input type="range" id="inner-slider" class="ui-panel__slider"
-          min="2.5"
-          max="8"
+          min="${this.config.disk.minInnerRadius}"
+          max="${this.config.disk.maxInnerRadius}"
           step="0.5"
           value="${this.config.disk.innerRadius}">
       </div>
@@ -51,11 +51,11 @@ export class UIController {
       <div class="ui-panel__group">
         <label class="ui-panel__label">
           Disk Outer Radius
-          <span class="ui-panel__value" data-value="outer">${this.config.disk.outerRadius.toFixed(1)}</span>
+          <span class="ui-panel__value" id="outer-value" data-value="outer">${this.config.disk.outerRadius.toFixed(1)}</span>
         </label>
         <input type="range" id="outer-slider" class="ui-panel__slider"
-          min="8"
-          max="25"
+          min="${this.config.disk.minOuterRadius}"
+          max="${this.config.disk.maxOuterRadius}"
           step="1"
           value="${this.config.disk.outerRadius}">
       </div>
@@ -129,13 +129,14 @@ export class UIController {
   }
 
   setupEventListeners() {
-    // Black hole mass
-    const massSlider = document.getElementById('mass-slider');
-    const massValue = this.getValueElement('mass');
-    massSlider.addEventListener('input', (e) => {
+    // Black hole event horizon radius
+    const eventHorizonRadiusSlider = document.getElementById('event-horizon-radius-slider');
+    const eventHorizonRadiusValue = this.getValueElement('eventHorizonRadius');
+    eventHorizonRadiusSlider.addEventListener('input', (e) => {
       const value = parseFloat(e.target.value);
-      massValue.textContent = value.toFixed(2);
+      eventHorizonRadiusValue.textContent = value.toFixed(2);
       this.callbacks.onMassChange?.(value);
+      this.applyDiskRadiusState(this.callbacks.getDiskRadiusState?.());
     });
 
     // Disk inner radius
@@ -144,7 +145,8 @@ export class UIController {
     innerSlider.addEventListener('input', (e) => {
       const value = parseFloat(e.target.value);
       innerValue.textContent = value.toFixed(1);
-      this.callbacks.onInnerRadiusChange?.(value);
+      const state = this.callbacks.onInnerRadiusChange?.(value);
+      this.applyDiskRadiusState(state || this.callbacks.getDiskRadiusState?.());
     });
 
     // Disk outer radius
@@ -153,7 +155,8 @@ export class UIController {
     outerSlider.addEventListener('input', (e) => {
       const value = parseFloat(e.target.value);
       outerValue.textContent = value.toFixed(1);
-      this.callbacks.onOuterRadiusChange?.(value);
+      const state = this.callbacks.onOuterRadiusChange?.(value);
+      this.applyDiskRadiusState(state || this.callbacks.getDiskRadiusState?.());
     });
 
     // Rotation speed
@@ -174,6 +177,8 @@ export class UIController {
       this.callbacks.onDistanceChange?.(value);
     });
 
+    this.applyDiskRadiusState(this.callbacks.getDiskRadiusState?.());
+
     // Glow intensity
     const glowSlider = document.getElementById('glow-slider');
     const glowValue = this.getValueElement('glow');
@@ -182,6 +187,29 @@ export class UIController {
       glowValue.textContent = value.toFixed(1);
       this.callbacks.onGlowChange?.(value);
     });
+  }
+
+  applyDiskRadiusState(state) {
+    if (!state) return;
+
+    const innerSlider = document.getElementById('inner-slider');
+    const outerSlider = document.getElementById('outer-slider');
+    const innerValue = this.getValueElement('inner');
+    const outerValue = this.getValueElement('outer');
+
+    if (innerSlider && typeof state.innerRadius === 'number') {
+      innerSlider.value = state.innerRadius;
+      innerSlider.min = state.innerMin;
+      innerSlider.max = state.innerMax;
+      if (innerValue) innerValue.textContent = state.innerRadius.toFixed(1);
+    }
+
+    if (outerSlider && typeof state.outerRadius === 'number') {
+      outerSlider.value = state.outerRadius;
+      outerSlider.min = state.outerMin;
+      outerSlider.max = state.outerMax;
+      if (outerValue) outerValue.textContent = state.outerRadius.toFixed(1);
+    }
   }
 
   toggleUI() {

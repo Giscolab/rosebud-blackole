@@ -46,10 +46,10 @@ export class BlackHole {
     this.scene.add(pointLight);
   }
 
-  setRadius(radius) {
-    this.radius = radius;
+  setRadius(eventHorizonRadius) {
+    this.radius = eventHorizonRadius;
     if (this.mesh) {
-      this.mesh.scale.setScalar(radius / 2.0);
+      this.mesh.scale.setScalar(eventHorizonRadius / 2.0);
     }
   }
 
