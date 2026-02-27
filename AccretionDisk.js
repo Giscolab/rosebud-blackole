@@ -14,7 +14,53 @@ export class AccretionDisk {
     this.particleSystem = null;
     this.glowRings = [];
     
+    this.applyRadii(this.config.innerRadius, this.config.outerRadius, false);
     this.createDisk();
+  }
+
+
+  sanitizeRadii(innerRadius = this.config.innerRadius, outerRadius = this.config.outerRadius) {
+    const minInnerFromBlackHole = this.blackHole.radius + this.config.innerRadiusMargin;
+    const innerMin = Math.max(this.config.minInnerRadius, minInnerFromBlackHole);
+    const innerMax = Math.min(this.config.maxInnerRadius, this.config.maxOuterRadius - this.config.minOuterGap);
+
+    let safeInner = Math.min(Math.max(innerRadius, innerMin), innerMax);
+
+    const outerMin = Math.max(this.config.minOuterRadius, safeInner + this.config.minOuterGap);
+    const outerMax = this.config.maxOuterRadius;
+    let safeOuter = Math.min(Math.max(outerRadius, outerMin), outerMax);
+
+    if (safeOuter - safeInner < this.config.minOuterGap) {
+      safeOuter = Math.min(outerMax, safeInner + this.config.minOuterGap);
+      if (safeOuter - safeInner < this.config.minOuterGap) {
+        safeInner = Math.max(innerMin, safeOuter - this.config.minOuterGap);
+      }
+    }
+
+    return {
+      innerRadius: safeInner,
+      outerRadius: safeOuter,
+      innerMin,
+      innerMax,
+      outerMin: Math.max(this.config.minOuterRadius, safeInner + this.config.minOuterGap),
+      outerMax
+    };
+  }
+
+  applyRadii(innerRadius, outerRadius, shouldRegenerate = true) {
+    const state = this.sanitizeRadii(innerRadius, outerRadius);
+    this.config.innerRadius = state.innerRadius;
+    this.config.outerRadius = state.outerRadius;
+
+    if (shouldRegenerate) {
+      this.regenerateDisk();
+    }
+
+    return state;
+  }
+
+  getRadiusState() {
+    return this.sanitizeRadii(this.config.innerRadius, this.config.outerRadius);
   }
 
   createDisk() {
@@ -154,14 +200,17 @@ export class AccretionDisk {
     this.particleSystem.geometry.attributes.position.needsUpdate = true;
   }
 
-  setInnerRadius(radius) {
-    this.config.innerRadius = radius;
-    this.regenerateDisk();
+  setInnerRadius(innerRadius) {
+    return this.applyRadii(innerRadius, this.config.outerRadius);
   }
 
-  setOuterRadius(radius) {
-    this.config.outerRadius = radius;
-    this.regenerateDisk();
+  setOuterRadius(outerRadius) {
+    return this.applyRadii(this.config.innerRadius, outerRadius);
+  }
+
+  onBlackHoleRadiusChange(eventHorizonRadius) {
+    this.blackHole.radius = eventHorizonRadius;
+    return this.applyRadii(this.config.innerRadius, this.config.outerRadius);
   }
 
   setRotationSpeed(speed) {

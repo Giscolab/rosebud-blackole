@@ -13,6 +13,12 @@ export const config = {
   disk: {
     innerRadius: 3.0,       // Inner edge (ISCO ~3M for Schwarzschild)
     outerRadius: 12.0,      // Outer edge
+    innerRadiusMargin: 0.6, // Must stay above event horizon radius + margin
+    minOuterGap: 1.0,       // Outer edge must stay above inner edge + gap
+    minInnerRadius: 2.5,
+    maxInnerRadius: 8.0,
+    minOuterRadius: 8.0,
+    maxOuterRadius: 25.0,
     thickness: 0.3,         // Vertical thickness
     particleCount: 8000,    // Number of particles in disk
     rotationSpeed: 1.0,     // Angular velocity multiplier
