@@ -13,6 +13,9 @@ export class BlackHole {
     this.scene = scene;
     this.radius = radius;
     this.mesh = null;
+    this.glowMesh = null;
+    this.pointLight = null;
+    this.baseRadius = radius;
 
     this.createEventHorizon();
     this.createSingularity();
@@ -39,15 +42,15 @@ export class BlackHole {
       blending: THREE.AdditiveBlending
     });
 
-    const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-    this.mesh.add(glowMesh);
+    this.glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+    this.mesh.add(this.glowMesh);
   }
 
   createSingularity() {
     // Central point light to represent the singularity's influence
-    const pointLight = new THREE.PointLight(0x00ffcc, 2, 50);
-    pointLight.position.set(0, 0, 0);
-    this.scene.add(pointLight);
+    this.pointLight = new THREE.PointLight(0x00ffcc, 2, 50);
+    this.pointLight.position.set(0, 0, 0);
+    this.scene.add(this.pointLight);
   }
 
   /**
@@ -57,7 +60,22 @@ export class BlackHole {
   setRadius(eventHorizonRadius) {
     this.radius = eventHorizonRadius;
     if (this.mesh) {
-      this.mesh.scale.setScalar(eventHorizonRadius / 2.0);
+      this.mesh.scale.setScalar(eventHorizonRadius / this.baseRadius);
+    }
+  }
+
+
+  /**
+   * API publique: met à jour l'intensité visuelle du glow.
+   * @param {number} intensity
+   */
+  setGlowIntensity(intensity) {
+    if (this.glowMesh) {
+      this.glowMesh.material.opacity = Math.max(0.05, Math.min(0.35, intensity * 0.08));
+    }
+
+    if (this.pointLight) {
+      this.pointLight.intensity = Math.max(0.5, Math.min(5, intensity));
     }
   }
 

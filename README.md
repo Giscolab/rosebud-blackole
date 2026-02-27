@@ -106,6 +106,12 @@ Notes :
 - UI non internationalisée et non orientée accessibilité avancée (lecteurs d’écran, navigation complète clavier, etc.).
 - Optimisations GPU/CPU limitées pour des densités de particules très élevées.
 
+## Audit technique détaillé
+
+Un audit priorisé (architecture, dettes techniques, manques fonctionnels, plan de branchage inter-modules, KPI) est disponible ici :
+
+- `docs/PROJECT_AUDIT_ROADMAP.md`
+
 ## Roadmap
 
 ### 1) Physics
