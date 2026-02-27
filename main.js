@@ -21,7 +21,7 @@ class BlackHoleSimulation {
     this.cameraController = null;
     this.uiController = null;
     this.clock = new THREE.Clock();
-    
+
     this.init();
     this.animate();
   }
@@ -41,7 +41,7 @@ class BlackHoleSimulation {
     this.camera.position.set(0, config.camera.distance * 0.3, config.camera.distance);
 
     // Renderer setup
-    this.renderer = new THREE.WebGLRenderer({ 
+    this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: false
     });

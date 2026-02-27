@@ -3,35 +3,35 @@
 export const config = {
   // Black hole physics
   blackHole: {
-    mass: 1.0,              // Schwarzschild mass (M)
-    radius: 2.0,            // Event horizon radius (2M for Schwarzschild)
+    mass: 1.0, // Schwarzschild mass (M)
+    radius: 2.0, // Event horizon radius (2M for Schwarzschild)
     minRadius: 0.5,
     maxRadius: 5.0
   },
 
   // Accretion disk parameters
   disk: {
-    innerRadius: 3.0,       // Inner edge (ISCO ~3M for Schwarzschild)
-    outerRadius: 12.0,      // Outer edge
+    innerRadius: 3.0, // Inner edge (ISCO ~3M for Schwarzschild)
+    outerRadius: 12.0, // Outer edge
     innerRadiusMargin: 0.6, // Must stay above event horizon radius + margin
-    minOuterGap: 1.0,       // Outer edge must stay above inner edge + gap
+    minOuterGap: 1.0, // Outer edge must stay above inner edge + gap
     minInnerRadius: 2.5,
     maxInnerRadius: 8.0,
     minOuterRadius: 8.0,
     maxOuterRadius: 25.0,
-    thickness: 0.3,         // Vertical thickness
-    particleCount: 8000,    // Number of particles in disk
-    rotationSpeed: 1.0,     // Angular velocity multiplier
-    temperature: 1.0        // Color temperature (affects emission color)
+    thickness: 0.3, // Vertical thickness
+    particleCount: 8000, // Number of particles in disk
+    rotationSpeed: 1.0, // Angular velocity multiplier
+    temperature: 1.0 // Color temperature (affects emission color)
   },
 
   // Camera settings
   camera: {
-    distance: 25.0,         // Distance from black hole
+    distance: 25.0, // Distance from black hole
     minDistance: 8.0,
     maxDistance: 80.0,
     fov: 60,
-    orbitSpeed: 0.3,        // Mouse sensitivity
+    orbitSpeed: 0.3, // Mouse sensitivity
     autoRotate: false,
     autoRotateSpeed: 0.1
   },
@@ -50,14 +50,14 @@ export const config = {
     enabled: true,
     maxSteps: 100,
     stepSize: 0.05,
-    bendingStrength: 1.0    // Gravitational lensing strength
+    bendingStrength: 1.0 // Gravitational lensing strength
   }
 };
 
 // Color palette for disk temperature gradient
 export const diskColors = {
-  hot: 0x00ffff,    // Cyan-white (hottest, inner regions)
-  warm: 0x00ccff,   // Bright blue
-  cool: 0x0066ff,   // Deep blue
-  cold: 0x0033aa    // Dark blue (coolest, outer regions)
+  hot: 0x00ffff, // Cyan-white (hottest, inner regions)
+  warm: 0x00ccff, // Bright blue
+  cool: 0x0066ff, // Deep blue
+  cold: 0x0033aa // Dark blue (coolest, outer regions)
 };

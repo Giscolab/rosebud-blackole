@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 /**
  * CameraController - Orbital camera around the black hole
  * Handles mouse/keyboard input for smooth camera movement
@@ -14,7 +12,7 @@ export class CameraController {
     // Spherical coordinates
     this.distance = config.distance;
     this.phi = Math.PI / 2; // Polar angle (0 = top, PI = bottom)
-    this.theta = 0;         // Azimuthal angle
+    this.theta = 0; // Azimuthal angle
 
     // Mouse state
     this.isMouseDown = false;
@@ -80,33 +78,71 @@ export class CameraController {
 
     // Keyboard controls
     window.addEventListener('keydown', (e) => {
-      switch(e.key.toLowerCase()) {
-        case 'w': case 'arrowup': this.keys.forward = true; break;
-        case 's': case 'arrowdown': this.keys.backward = true; break;
-        case 'a': case 'arrowleft': this.keys.left = true; break;
-        case 'd': case 'arrowright': this.keys.right = true; break;
-        case 'q': this.keys.up = true; break;
-        case 'e': this.keys.down = true; break;
-        case ' ': this.autoRotate = !this.autoRotate; break;
+      switch (e.key.toLowerCase()) {
+        case 'w':
+        case 'arrowup':
+          this.keys.forward = true;
+          break;
+        case 's':
+        case 'arrowdown':
+          this.keys.backward = true;
+          break;
+        case 'a':
+        case 'arrowleft':
+          this.keys.left = true;
+          break;
+        case 'd':
+        case 'arrowright':
+          this.keys.right = true;
+          break;
+        case 'q':
+          this.keys.up = true;
+          break;
+        case 'e':
+          this.keys.down = true;
+          break;
+        case ' ':
+          this.autoRotate = !this.autoRotate;
+          break;
       }
     });
 
     window.addEventListener('keyup', (e) => {
-      switch(e.key.toLowerCase()) {
-        case 'w': case 'arrowup': this.keys.forward = false; break;
-        case 's': case 'arrowdown': this.keys.backward = false; break;
-        case 'a': case 'arrowleft': this.keys.left = false; break;
-        case 'd': case 'arrowright': this.keys.right = false; break;
-        case 'q': this.keys.up = false; break;
-        case 'e': this.keys.down = false; break;
+      switch (e.key.toLowerCase()) {
+        case 'w':
+        case 'arrowup':
+          this.keys.forward = false;
+          break;
+        case 's':
+        case 'arrowdown':
+          this.keys.backward = false;
+          break;
+        case 'a':
+        case 'arrowleft':
+          this.keys.left = false;
+          break;
+        case 'd':
+        case 'arrowright':
+          this.keys.right = false;
+          break;
+        case 'q':
+          this.keys.up = false;
+          break;
+        case 'e':
+          this.keys.down = false;
+          break;
       }
     });
   }
 
+  /**
+   * API publique: met à jour la position caméra selon les entrées.
+   * @param {number} deltaTime
+   */
   update(deltaTime) {
     // Handle keyboard movement
     const moveSpeed = 10 * deltaTime;
-    
+
     if (this.keys.forward) this.distance -= moveSpeed;
     if (this.keys.backward) this.distance += moveSpeed;
     if (this.keys.left) this.theta -= moveSpeed * 0.5;
@@ -137,6 +173,10 @@ export class CameraController {
     this.camera.lookAt(this.target);
   }
 
+  /**
+   * API publique: met à jour la distance caméra avec bornes.
+   * @param {number} distance
+   */
   setDistance(distance) {
     this.distance = distance;
     this.distance = Math.max(

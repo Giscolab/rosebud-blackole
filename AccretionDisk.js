@@ -13,16 +13,18 @@ export class AccretionDisk {
     this.particles = [];
     this.particleSystem = null;
     this.glowRings = [];
-    
+
     this.applyRadii(this.config.innerRadius, this.config.outerRadius, false);
     this.createDisk();
   }
 
-
   sanitizeRadii(innerRadius = this.config.innerRadius, outerRadius = this.config.outerRadius) {
     const minInnerFromBlackHole = this.blackHole.radius + this.config.innerRadiusMargin;
     const innerMin = Math.max(this.config.minInnerRadius, minInnerFromBlackHole);
-    const innerMax = Math.min(this.config.maxInnerRadius, this.config.maxOuterRadius - this.config.minOuterGap);
+    const innerMax = Math.min(
+      this.config.maxInnerRadius,
+      this.config.maxOuterRadius - this.config.minOuterGap
+    );
 
     let safeInner = Math.min(Math.max(innerRadius, innerMin), innerMax);
 
@@ -59,6 +61,9 @@ export class AccretionDisk {
     return state;
   }
 
+  /**
+   * API publique: expose l'état de rayons validé pour l'UI.
+   */
   getRadiusState() {
     return this.sanitizeRadii(this.config.innerRadius, this.config.outerRadius);
   }
@@ -72,23 +77,25 @@ export class AccretionDisk {
     // Generate particles in disk formation
     for (let i = 0; i < this.config.particleCount; i++) {
       // Random radius between inner and outer disk
-      const radius = this.config.innerRadius + 
+      const radius =
+        this.config.innerRadius +
         Math.random() * (this.config.outerRadius - this.config.innerRadius);
-      
+
       // Random angle
       const angle = Math.random() * Math.PI * 2;
-      
+
       // Position in disk plane with slight thickness
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       const y = (Math.random() - 0.5) * this.config.thickness;
-      
+
       positions.push(x, y, z);
 
       // Color based on temperature (inner = hotter = brighter)
-      const temp = 1.0 - ((radius - this.config.innerRadius) / 
-        (this.config.outerRadius - this.config.innerRadius));
-      
+      const temp =
+        1.0 -
+        (radius - this.config.innerRadius) / (this.config.outerRadius - this.config.innerRadius);
+
       const color = this.getTemperatureColor(temp);
       colors.push(color.r, color.g, color.b);
 
@@ -128,9 +135,10 @@ export class AccretionDisk {
     // Inner and outer glow rings for atmospheric effect
     const ringCount = 3;
     for (let i = 0; i < ringCount; i++) {
-      const radius = this.config.innerRadius + 
+      const radius =
+        this.config.innerRadius +
         (this.config.outerRadius - this.config.innerRadius) * (i / (ringCount - 1));
-      
+
       const ringGeometry = new THREE.RingGeometry(radius - 0.5, radius + 0.5, 64);
       const ringMaterial = new THREE.MeshBasicMaterial({
         color: diskColors.warm,
@@ -140,7 +148,7 @@ export class AccretionDisk {
         blending: THREE.AdditiveBlending,
         depthWrite: false
       });
-      
+
       const ring = new THREE.Mesh(ringGeometry, ringMaterial);
       ring.rotation.x = Math.PI / 2;
       this.scene.add(ring);
@@ -162,10 +170,14 @@ export class AccretionDisk {
     // Interpolate between cold (blue) and hot (cyan-white)
     const cold = new THREE.Color(diskColors.cold);
     const hot = new THREE.Color(diskColors.hot);
-    
+
     return cold.lerp(hot, temperature);
   }
 
+  /**
+   * API publique: met à jour l'animation du disque.
+   * @param {number} deltaTime
+   */
   update(deltaTime) {
     if (!this.particleSystem) return;
 
@@ -175,18 +187,17 @@ export class AccretionDisk {
     // Update each particle's orbital position
     for (let i = 0; i < this.particles.length; i++) {
       const particle = this.particles[i];
-      
+
       // Update orbital angle based on velocity
       particle.angle += particle.speed * deltaTime;
-      
+
       // Calculate new position
       const x = Math.cos(particle.angle) * particle.radius;
       const z = Math.sin(particle.angle) * particle.radius;
-      
+
       // Add slight vertical oscillation for turbulence
-      const y = Math.sin(particle.verticalPhase + time * 2) * 
-        this.config.thickness * 0.5;
-      
+      const y = Math.sin(particle.verticalPhase + time * 2) * this.config.thickness * 0.5;
+
       // Apply gravitational perturbation (particles wobble near black hole)
       const perturbation = Math.exp(-particle.radius / 3) * 0.2;
       const wobbleX = Math.sin(time * 3 + i * 0.1) * perturbation;
@@ -200,19 +211,35 @@ export class AccretionDisk {
     this.particleSystem.geometry.attributes.position.needsUpdate = true;
   }
 
+  /**
+   * API publique: définit le rayon interne puis renvoie l'état validé.
+   * @param {number} innerRadius
+   */
   setInnerRadius(innerRadius) {
     return this.applyRadii(innerRadius, this.config.outerRadius);
   }
 
+  /**
+   * API publique: définit le rayon externe puis renvoie l'état validé.
+   * @param {number} outerRadius
+   */
   setOuterRadius(outerRadius) {
     return this.applyRadii(this.config.innerRadius, outerRadius);
   }
 
+  /**
+   * API publique: synchronise le disque avec la variation de rayon du trou noir.
+   * @param {number} eventHorizonRadius
+   */
   onBlackHoleRadiusChange(eventHorizonRadius) {
     this.blackHole.radius = eventHorizonRadius;
     return this.applyRadii(this.config.innerRadius, this.config.outerRadius);
   }
 
+  /**
+   * API publique: met à jour la vitesse de rotation du disque.
+   * @param {number} speed
+   */
   setRotationSpeed(speed) {
     this.config.rotationSpeed = speed;
     // Update particle velocities
@@ -234,6 +261,10 @@ export class AccretionDisk {
     this.createDisk();
   }
 
+  /**
+   * API publique: règle l'opacité du système de particules.
+   * @param {number} opacity
+   */
   setOpacity(opacity) {
     if (this.particleSystem) {
       this.particleSystem.material.opacity = opacity;

@@ -8,9 +8,10 @@ Ce sont des composants prêts pour la production, testés - mais utilisez-les un
 **Vous devez utiliser l'outil `read` pour charger le code source d'un composant AVANT de l'importer.**
 
 Exemple de flux de travail :
+
 ```javascript
 // 1. Utilisez d'abord l'outil read
-read(file_path="/rosie/controls/rosieControls.js")
+read((file_path = '/rosie/controls/rosieControls.js'));
 
 // 2. Importez ensuite après examen
 import { PlayerController } from './rosie/controls/rosieControls.js';
@@ -26,6 +27,7 @@ import { PlayerController } from './rosie/controls/rosieControls.js';
 **Exports :** `PlayerController`, `ThirdPersonCameraController`, `FirstPersonCameraController`
 
 **Fonctionnalités :**
+
 - Mouvement WASD avec direction relative à la caméra
 - Saut, gravité, détection du sol
 - Caméra en orbite troisième personne OU verrouillage pointeur première personne
@@ -35,6 +37,7 @@ import { PlayerController } from './rosie/controls/rosieControls.js';
 **Ne pas utiliser pour :** Jeux 2D, jeux de course, jeux en vue du dessus
 
 **Exemple rapide :**
+
 ```javascript
 const controller = new PlayerController(playerMesh, {
   moveSpeed: 10,
@@ -42,8 +45,7 @@ const controller = new PlayerController(playerMesh, {
   groundLevel: 0
 });
 
-const camera = new ThirdPersonCameraController(
-  camera, playerMesh, renderer.domElement, {
+const camera = new ThirdPersonCameraController(camera, playerMesh, renderer.domElement, {
   distance: 7,
   height: 3
 });
@@ -61,6 +63,7 @@ controller.update(deltaTime, rotation);
 **Exports :** `VirtualJoystick`, `ActionButton`, `MobileControlsManager`
 
 **Fonctionnalités :**
+
 - Joystick virtuel pour le mouvement (position fixe, côté gauche)
 - Boutons d'action avec retour visuel (sauter, tirer, etc.)
 - Gestionnaire de contrôles mobiles avec gestion des zones sécurisées
@@ -69,6 +72,7 @@ controller.update(deltaTime, rotation);
 **Ne pas utiliser pour :** Jeux 3D, jeux uniquement sur ordinateur
 
 **Exemple rapide :**
+
 ```javascript
 import { MobileControlsManager } from './rosie/controls/phaserMobileControls.js';
 
@@ -97,6 +101,7 @@ this.player.setVelocityX(move.x * speed);
 ## Règles d'Utilisation
 
 ✅ **À FAIRE :**
+
 - Lire la source avec l'outil `read` avant utilisation
 - Importer depuis le dossier rosie : `'./rosie/controls/...'`
 - Utiliser uniquement les composants qui correspondent à la demande
@@ -104,25 +109,30 @@ this.player.setVelocityX(move.x * speed);
 - Utiliser rosieControls.js pour les jeux 3D
 
 ❌ **À NE PAS FAIRE :**
+
 - Importer sans lire d'abord
 - Recréer ces composants
 - Utiliser les contrôles 3D pour les jeux 2D (ou vice versa)
+
 ---
 
 ## 🎨 Conventions CSS
 
 ### Naming (BEM)
+
 - Utiliser la convention **BEM** pour toutes les classes UI :
   - Bloc : `.ui-panel`, `.ui-toggle`, `.title-overlay`
   - Élément : `.ui-panel__title`, `.ui-panel__group`, `.ui-panel__value`, `.title-overlay__subtitle`
 - Éviter les noms génériques (`.control-group`, `.info-text`, etc.) dans les nouvelles contributions.
 
 ### Structure
+
 - Centraliser les styles dans `style.css`.
 - Garder `index.html` sans style inline ni balises `<style>`.
 - Préférer des classes pour le styling et réserver les `id` aux hooks JavaScript indispensables (ex. sliders pilotés par `UIController`).
 
 ### Exceptions
+
 - Les pseudo-éléments/pseudo-classes (`:hover`, `::-webkit-slider-thumb`, `::-moz-range-thumb`) sont autorisés même si la cible principale est une classe BEM.
 - Les sélecteurs globaux sont limités aux fondations documentaires (`html`, `body`, `canvas`).
 

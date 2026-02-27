@@ -9,7 +9,7 @@ export class Starfield {
     this.scene = scene;
     this.count = count;
     this.starfield = null;
-    
+
     this.createStarfield();
   }
 
@@ -59,12 +59,16 @@ export class Starfield {
     this.scene.add(this.starfield);
   }
 
-  update(deltaTime) {
+  /**
+   * API publique: met à jour l'animation du fond stellaire.
+   * @param {number} deltaTime
+   */
+  update(_deltaTime) {
     // Subtle twinkling effect
     if (this.starfield) {
       const time = Date.now() * 0.0001;
       const colors = this.starfield.geometry.attributes.color.array;
-      
+
       for (let i = 0; i < this.count; i++) {
         // Only twinkle 10% of stars
         if (Math.random() > 0.99) {
@@ -75,7 +79,7 @@ export class Starfield {
           colors[i * 3 + 2] = brightness;
         }
       }
-      
+
       this.starfield.geometry.attributes.color.needsUpdate = true;
     }
   }

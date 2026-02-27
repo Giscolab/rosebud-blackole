@@ -3,6 +3,11 @@
  * Handles real-time parameter adjustments
  */
 export class UIController {
+  /**
+   * API publique: initialise l'UI et branche les callbacks métier.
+   * @param {object} config
+   * @param {object} callbacks
+   */
   constructor(config, callbacks) {
     this.config = config;
     this.callbacks = callbacks;
