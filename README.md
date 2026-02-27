@@ -107,3 +107,21 @@ this.player.setVelocityX(move.x * speed);
 - Importer sans lire d'abord
 - Recréer ces composants
 - Utiliser les contrôles 3D pour les jeux 2D (ou vice versa)
+---
+
+## 🎨 Conventions CSS
+
+### Naming (BEM)
+- Utiliser la convention **BEM** pour toutes les classes UI :
+  - Bloc : `.ui-panel`, `.ui-toggle`, `.title-overlay`
+  - Élément : `.ui-panel__title`, `.ui-panel__group`, `.ui-panel__value`, `.title-overlay__subtitle`
+- Éviter les noms génériques (`.control-group`, `.info-text`, etc.) dans les nouvelles contributions.
+
+### Structure
+- Centraliser les styles dans `style.css`.
+- Garder `index.html` sans style inline ni balises `<style>`.
+- Préférer des classes pour le styling et réserver les `id` aux hooks JavaScript indispensables (ex. sliders pilotés par `UIController`).
+
+### Exceptions
+- Les pseudo-éléments/pseudo-classes (`:hover`, `::-webkit-slider-thumb`, `::-moz-range-thumb`) sont autorisés même si la cible principale est une classe BEM.
+- Les sélecteurs globaux sont limités aux fondations documentaires (`html`, `body`, `canvas`).
