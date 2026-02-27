@@ -17,7 +17,7 @@ Ce repo sert à visualiser de manière interactive :
 
 ### Entrées principales
 
-- `index.html` : bootstrap de la page, import map Three.js, chargement de `main.js`.
+- `index.html` : bootstrap de la page et chargement de `main.js`.
 - `main.js` : classe `BlackHoleSimulation`, initialise la scène, instancie les systèmes et pilote la boucle d’animation.
 - `config.js` : configuration centralisée (black hole, disque, caméra, rendu, ray tracing simplifié) + palette de couleurs du disque.
 
@@ -33,29 +33,57 @@ Ce repo sert à visualiser de manière interactive :
 
 - `rosie/` : composants hérités (hors cœur de la simulation actuelle).
 
-## Lancement local (HTTP requis)
+## Lancement local stable (Vite + HTTP requis)
 
-Le projet utilise des modules ES (`type="module"`) et une import map : il faut le lancer via un **serveur HTTP local**.
+Le projet utilise des modules ES (`type="module"`) et doit tourner via un **serveur HTTP local**. Un serveur Vite explicite est fourni avec une config CORS dédiée (`vite.config.js` > `server.cors`).
 
-### Option A — Python
-
-```bash
-python3 -m http.server 8000
-```
-
-Puis ouvrir : `http://localhost:8000`
-
-### Option B — Node (serve)
+### Installation
 
 ```bash
-npx serve .
+npm install
 ```
 
-Puis ouvrir l’URL affichée par `serve`.
+### Démarrage dev
+
+```bash
+npm run dev
+```
+
+URL imposée : `http://localhost:5173`
+
+### Build de production (optionnel)
+
+```bash
+npm run build
+npm run preview
+```
+
+Preview local : `http://localhost:4173`
 
 ### Pourquoi pas `file://` ?
 
-Un chargement direct (`file://.../index.html`) casse généralement la résolution des modules/imports et certaines règles CORS du navigateur.
+Le projet bloque explicitement l’exécution via `file://` (voir `main.js`) pour éviter les erreurs de résolution de modules/CORS. Utilisez toujours `http://localhost`.
+
+## En-têtes CORS à prévoir côté reverse proxy (production)
+
+Si vous servez le front derrière un reverse proxy (Nginx, Traefik, Apache, etc.), exposez explicitement les en-têtes suivants pour les assets/modules :
+
+- `Access-Control-Allow-Origin: https://votre-domaine-front.example`
+- `Access-Control-Allow-Methods: GET, HEAD, OPTIONS`
+- `Access-Control-Allow-Headers: Content-Type, Authorization`
+
+Notes :
+- Évitez `*` si vous utilisez des cookies/credentials.
+- Répondez correctement aux requêtes `OPTIONS` (preflight) avec un code `204`/`200`.
+- Gardez les origines autorisées alignées avec vos domaines réels (prod, staging).
+
+## Dépannage CORS
+
+- Vérifier l’URL : utilisez `http://localhost:5173` (pas `file://`).
+- Vérifier le serveur : lancez `npm run dev` et observez les erreurs dans la console navigateur.
+- Vérifier le proxy : confirmez la présence des en-têtes `Access-Control-Allow-*` sur les ressources JS/CSS.
+- Vérifier l’origine des imports : la dépendance `three` est installée localement via npm (plus de dépendance CDN par défaut).
+- En cas de preflight bloqué : autoriser `OPTIONS` côté proxy + méthodes/headers attendus.
 
 ## Fonctionnalités actuelles
 
@@ -74,7 +102,7 @@ Un chargement direct (`file://.../index.html`) casse généralement la résoluti
 
 - Modèle physique simplifié : ce n’est pas un solveur GR complet (orbites, transfert radiatif, lentille gravitationnelle réaliste).
 - Pas de pipeline scientifique (unités physiques calibrées, validation sur données observées, export de métriques).
-- Dépendance CDN pour Three.js (pas de build locké/offline par défaut).
+- Nécessite une installation locale des dépendances npm (`three`, `vite`).
 - UI non internationalisée et non orientée accessibilité avancée (lecteurs d’écran, navigation complète clavier, etc.).
 - Optimisations GPU/CPU limitées pour des densités de particules très élevées.
 
