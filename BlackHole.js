@@ -5,11 +5,15 @@ import * as THREE from 'three';
  * Represents the gravitational center with visual event horizon
  */
 export class BlackHole {
+  /**
+   * @param {THREE.Scene} scene
+   * @param {number} radius
+   */
   constructor(scene, radius = 2.0) {
     this.scene = scene;
     this.radius = radius;
     this.mesh = null;
-    
+
     this.createEventHorizon();
     this.createSingularity();
   }
@@ -21,7 +25,7 @@ export class BlackHole {
       color: 0x000000,
       side: THREE.FrontSide
     });
-    
+
     this.mesh = new THREE.Mesh(geometry, material);
     this.scene.add(this.mesh);
 
@@ -34,7 +38,7 @@ export class BlackHole {
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending
     });
-    
+
     const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
     this.mesh.add(glowMesh);
   }
@@ -46,6 +50,10 @@ export class BlackHole {
     this.scene.add(pointLight);
   }
 
+  /**
+   * API publique: met à jour le rayon de l'horizon des événements.
+   * @param {number} eventHorizonRadius
+   */
   setRadius(eventHorizonRadius) {
     this.radius = eventHorizonRadius;
     if (this.mesh) {
@@ -60,7 +68,7 @@ export class BlackHole {
   gravitationalForce(position) {
     const distance = position.length();
     if (distance < this.radius) return new THREE.Vector3(0, 0, 0);
-    
+
     // Simplified gravitational force (F ∝ 1/r²)
     const forceMagnitude = (this.radius * this.radius) / (distance * distance * distance);
     return position.clone().multiplyScalar(-forceMagnitude);
@@ -73,7 +81,7 @@ export class BlackHole {
     return position.length() < this.radius;
   }
 
-  update(deltaTime) {
+  update(_deltaTime) {
     // Subtle pulsing effect for the glow
     if (this.mesh && this.mesh.children[0]) {
       const time = Date.now() * 0.001;

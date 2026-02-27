@@ -5,6 +5,7 @@ Simulation WebGL temps réel d’un trou noir (horizon des événements) et d’
 ## Objectif du projet
 
 Ce repo sert à visualiser de manière interactive :
+
 - un **trou noir** central (horizon + glow),
 - un **disque d’accrétion** de particules en rotation,
 - un **champ d’étoiles** de fond,
@@ -108,21 +109,25 @@ Notes :
 ## Roadmap
 
 ### 1) Physics
+
 - Raffiner la dynamique orbitale (vitesse locale, précession, pertes d’énergie).
 - Améliorer la modélisation visuelle relativiste (lensing, doppler/beaming, redshift).
 - Ajouter des presets astrophysiques (Stellar-mass, SMBH, etc.).
 
 ### 2) Performance
+
 - Réduire le coût CPU des updates particulaires (buffer updates, stratégies GPU-driven).
 - LOD / qualité adaptative selon FPS.
 - Profiling systématique + budget perf par module.
 
 ### 3) UX
+
 - Presets de caméra et scénarios guidés.
 - Aide contextuelle et infobulles scientifiques.
 - Meilleure accessibilité (contrastes, focus, raccourcis, labels ARIA).
 
 ### 4) Intégrations externes
+
 - Bundle outillage front (Vite/ESBuild) avec versions figées.
 - API d’export/import des presets de simulation.
 - Intégration éventuelle de datasets/références scientifiques externes.
@@ -132,3 +137,36 @@ Notes :
 La documentation Rosie précédente a été retirée du README principal car non pertinente au cœur du repo.
 
 - Archive conservée ici : `docs/ROSIE_ARCHIVE.md`
+
+## Conventions de code
+
+### Nommage
+
+- **Classes** : `PascalCase` (ex. `BlackHole`, `AccretionDisk`).
+- **Méthodes/fonctions** : `camelCase` avec verbe d’action (`setRadius`, `update`, `createDisk`).
+- **Constantes** : `UPPER_SNAKE_CASE` pour valeurs réellement constantes.
+- **Fichiers de modules** : `PascalCase.js` pour les classes exportées principales.
+
+### Événements UI
+
+- Préférer l’événement `input` pour les sliders afin d’avoir une mise à jour temps réel.
+- Les callbacks UI doivent être déclarés dans `main.js` via un objet explicite, pour garder un contrat lisible entre `UIController` et les systèmes métier.
+- Les handlers doivent rester fins et déléguer la logique aux classes domaine (`AccretionDisk`, `BlackHole`, `CameraController`).
+
+### Structure des modules
+
+- 1 module = 1 responsabilité principale.
+- Les APIs publiques consommées par `main.js` doivent être documentées par JSDoc dans la classe concernée.
+- Les imports inter-modules doivent rester explicites et éviter l’accès direct à l’état interne non documenté.
+
+## Contrat inter-fichiers (API consommées par `main.js`)
+
+`main.js` ne dépend que des méthodes publiques suivantes :
+
+- `BlackHole` : `setRadius(eventHorizonRadius)`, `update(deltaTime)`.
+- `AccretionDisk` : `onBlackHoleRadiusChange(eventHorizonRadius)`, `setInnerRadius(innerRadius)`, `setOuterRadius(outerRadius)`, `setRotationSpeed(speed)`, `setOpacity(opacity)`, `getRadiusState()`, `update(deltaTime)`.
+- `Starfield` : `update(deltaTime)`.
+- `CameraController` : `setDistance(distance)`, `update(deltaTime)`.
+- `UIController` : constructeur avec callbacks nommés (`onMassChange`, `onInnerRadiusChange`, `onOuterRadiusChange`, `onRotationSpeedChange`, `onDistanceChange`, `onGlowChange`, `getDiskRadiusState`).
+
+Ce contrat doit rester stable ou être mis à jour explicitement dans ce README et dans la JSDoc des classes impactées.
