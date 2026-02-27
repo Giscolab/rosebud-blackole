@@ -12,6 +12,7 @@ export class AccretionDisk {
     this.config = config;
     this.particles = [];
     this.particleSystem = null;
+    this.glowRings = [];
     
     this.createDisk();
   }
@@ -97,7 +98,18 @@ export class AccretionDisk {
       const ring = new THREE.Mesh(ringGeometry, ringMaterial);
       ring.rotation.x = Math.PI / 2;
       this.scene.add(ring);
+      this.glowRings.push(ring);
     }
+  }
+
+  disposeGlowRings() {
+    for (let i = 0; i < this.glowRings.length; i++) {
+      const ring = this.glowRings[i];
+      this.scene.remove(ring);
+      ring.geometry.dispose();
+      ring.material.dispose();
+    }
+    this.glowRings = [];
   }
 
   getTemperatureColor(temperature) {
@@ -168,6 +180,8 @@ export class AccretionDisk {
       this.particleSystem.geometry.dispose();
       this.particleSystem.material.dispose();
     }
+
+    this.disposeGlowRings();
     this.createDisk();
   }
 
@@ -175,5 +189,17 @@ export class AccretionDisk {
     if (this.particleSystem) {
       this.particleSystem.material.opacity = opacity;
     }
+  }
+
+  dispose() {
+    if (this.particleSystem) {
+      this.scene.remove(this.particleSystem);
+      this.particleSystem.geometry.dispose();
+      this.particleSystem.material.dispose();
+      this.particleSystem = null;
+    }
+
+    this.particles = [];
+    this.disposeGlowRings();
   }
 }
